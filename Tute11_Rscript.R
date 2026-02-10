@@ -4,8 +4,10 @@
 # Read in data either via File->Import Dataset and follow instruction concerning wide and long format or using code below (you will need to end the relevant disk address)
 # Reads data from an Excel file named "t10e4.xlsx" located at "C:/.../t10e4.xlsx"
 
-library(readxl)
 setwd("~/Dropbox/01 UoM-Teaching/2026-S0-Summer-QM2/Tute11")
+setwd("C:/Users/zhefan/Downloads/Tute11/Tute11")
+
+library(readxl)
 t10e4 <- read_excel("t10e4.xlsx")
 
 # Fit logistic regression model
@@ -13,6 +15,10 @@ logit = glm(COKE ~ PRATIO + DISP_COKE + DISP_PEPSI,   # Model formula: COKE as r
             family = binomial(link = "logit"),       # Binomial family with logit link function
             data = t10e4)                            # Data from t10e4 dataframe
 summary(logit)
+
+# deviance smaller the better. 
+# smallest deviance is 0, and the corresponding
+# model is called saturated model
 
 # for your own interest, null_deviance can be directly
 # calculate using the formula dev = -2 * (n_s*log(p)+n_f*log(1-p))
@@ -22,7 +28,7 @@ num_fail = sum(t10e4$COKE==0)
 null_dev = -2 * (num_succ*log(p_hat) + num_fail*log(1-p_hat))
 
 # McFadden's Pseudo R-squared based on deviance
-(1418.9 - 1567.7) / 1567.7
+-((1418.9 - 1567.7) / 1567.7)
 
 # Load DescTools package for calculating Pseudo R-squared
 library(DescTools) 
@@ -43,11 +49,19 @@ newdata = data.frame(PRATIO = mean(t10e4$PRATIO),     # PRATIO value is set to t
                      DISP_PEPSI = c(0, 1))            # Two scenarios for DISP_PEPSI: 0 (absent) and 1 (present)
 # Predict log-odds of COKE for new data
 predict.glm(logit, newdata, type = "link") 
+(z = 1.9230 + (-1.9957)*1.027249+1*0.3516)
+
 # Predict probabilities of COKE for new data
 predict.glm(logit, newdata, type = "response")
+(p = 1/(1+exp(-z)))
 
 # Install and load margins package for calculating marginal effects
 # install.packages("margins")
 library(margins)
 marginal_effects(logit, data = newdata)               # Calculate marginal effects of predictors on COKE probability
+
+
+
+
+
 
